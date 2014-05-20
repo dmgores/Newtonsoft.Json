@@ -189,6 +189,9 @@ namespace Newtonsoft.Json.Serialization
                 case JsonContractType.Linq:
                     ((JToken)value).WriteTo(writer, Serializer.Converters.ToArray());
                     break;
+                case JsonContractType.CustomNumber:
+                    SerializeCustomNumber(writer, value, (JsonCustomNumberContract)valueContract);
+                    break;
             }
         }
 
@@ -216,7 +219,7 @@ namespace Newtonsoft.Json.Serialization
         {
             if (value == null)
                 return false;
-            if (valueContract.ContractType == JsonContractType.Primitive || valueContract.ContractType == JsonContractType.String)
+            if (valueContract.ContractType == JsonContractType.Primitive || valueContract.ContractType == JsonContractType.String || valueContract.ContractType == JsonContractType.CustomNumber)
                 return false;
 
             bool? isReference = ResolveIsReference(valueContract, property, collectionContract, containerProperty);
@@ -250,7 +253,7 @@ namespace Newtonsoft.Json.Serialization
 
         private bool CheckForCircularReference(JsonWriter writer, object value, JsonProperty property, JsonContract contract, JsonContainerContract containerContract, JsonProperty containerProperty)
         {
-            if (value == null || contract.ContractType == JsonContractType.Primitive || contract.ContractType == JsonContractType.String)
+            if (value == null || contract.ContractType == JsonContractType.Primitive || contract.ContractType == JsonContractType.String || contract.ContractType == JsonContractType.CustomNumber)
                 return true;
 
             ReferenceLoopHandling? referenceLoopHandling = null;
@@ -361,6 +364,17 @@ namespace Newtonsoft.Json.Serialization
             string s;
             TryConvertToString(value, contract.UnderlyingType, out s);
             writer.WriteValue(s);
+
+            OnSerialized(writer, contract, value);
+        }
+
+        private void SerializeCustomNumber(JsonWriter writer, object value, JsonCustomNumberContract contract)
+        {
+            OnSerializing(writer, contract, value);
+
+            var v2 = value as IJsonNumber;
+            string s = v2.ToString();
+            writer.WriteRawValue(s);
 
             OnSerialized(writer, contract, value);
         }

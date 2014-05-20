@@ -47,7 +47,8 @@ namespace Newtonsoft.Json.Serialization
 #if !(NETFX_CORE || PORTABLE || PORTABLE40)
         Serializable,
 #endif
-        Linq
+        Linq,
+        CustomNumber,
     }
 
     /// <summary>
@@ -341,6 +342,10 @@ namespace Newtonsoft.Json.Serialization
                 InternalReadType = ReadType.ReadAsDateTimeOffset;
             }
 #endif
+            else if (typeof(IJsonNumber).IsAssignableFrom(underlyingType))
+            {
+                InternalReadType = ReadType.ReadAsCustomNumber;
+            }
             else
             {
                 InternalReadType = ReadType.Read;

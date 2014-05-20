@@ -395,6 +395,12 @@ namespace Newtonsoft.Json
         /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>
         public abstract DateTime? ReadAsDateTime();
 
+        /// <summary>
+        /// Reads the next JSON token from the stream as a <see iref="Newtonsoft.Json.Serialization.IJasonNumber"/>.
+        /// </summary>
+        /// <returns>A <see iref="Newtonsoft.Json.Serialization.IJasonNumber"/>. This method will return <c>null</c> at the end of an array.</returns>
+        public abstract IJsonNumber ReadAsCustomNumber(Type numberType);
+
 #if !NET20
         /// <summary>
         /// Reads the next JSON token from the stream as a <see cref="Nullable{DateTimeOffset}"/>.
@@ -660,6 +666,20 @@ namespace Newtonsoft.Json
                 return null;
 
             throw JsonReaderException.Create(this, "Error reading integer. Unexpected token: {0}.".FormatWith(CultureInfo.InvariantCulture, TokenType));
+        }
+
+
+        internal Type _customNumericType;
+        internal IJsonNumber ReadAsCustomNumberInternal(Type numberType)
+        {
+            _readType = ReadType.ReadAsCustomNumber;
+
+            _customNumericType = numberType;
+
+            if (!ReadInternal())
+                SetToken(JsonToken.None);
+
+            return Value as IJsonNumber;
         }
 
         internal string ReadAsStringInternal()

@@ -46,8 +46,9 @@ namespace Newtonsoft.Json
         ReadAsDecimal,
         ReadAsDateTime,
 #if !NET20
-        ReadAsDateTimeOffset
+        ReadAsDateTimeOffset,
 #endif
+        ReadAsCustomNumber,
     }
 
     /// <summary>
@@ -336,6 +337,15 @@ namespace Newtonsoft.Json
         public override int? ReadAsInt32()
         {
             return ReadAsInt32Internal();
+        }
+
+        /// <summary>
+        /// Reads the next JSON token from the stream as a <see iref="Newtonsoft.Json.Serialization.IJasonNumber"/>.
+        /// </summary>
+        /// <returns>A <see iref="Newtonsoft.Json.Serialization.IJasonNumber"/>. This method will return <c>null</c> at the end of an array.</returns>
+        public override Serialization.IJsonNumber ReadAsCustomNumber(Type numberType)
+        {
+            return ReadAsCustomNumberInternal(numberType);
         }
 
         /// <summary>
@@ -1236,6 +1246,14 @@ namespace Newtonsoft.Json
                         throw JsonReaderException.Create(this, "Input string '{0}' is not a valid decimal.".FormatWith(CultureInfo.InvariantCulture, _stringReference.ToString()));
                 }
 
+                numberType = JsonToken.Float;
+            }
+            else if (_readType == ReadType.ReadAsCustomNumber)
+            {
+                string number = _stringReference.ToString();
+                var customNumber = Activator.CreateInstance(_customNumericType) as Serialization.IJsonNumber;
+                customNumber.Parse(number);
+                numberValue = customNumber;
                 numberType = JsonToken.Float;
             }
             else

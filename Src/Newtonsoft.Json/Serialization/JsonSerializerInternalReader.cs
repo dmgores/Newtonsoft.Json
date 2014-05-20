@@ -1820,6 +1820,9 @@ To fix this error either change the environment to be fully trusted, change the 
                     reader.ReadAsDateTimeOffset();
                     break;
 #endif
+                case ReadType.ReadAsCustomNumber:
+                    reader.ReadAsCustomNumber(contract.UnderlyingType);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -204,6 +204,15 @@ namespace Newtonsoft.Json.Bson
         }
 
         /// <summary>
+        /// Reads the next JSON token from the stream as a <see iref="Newtonsoft.Json.Serialization.IJasonNumber"/>.
+        /// </summary>
+        /// <returns>A <see iref="Newtonsoft.Json.Serialization.IJasonNumber"/>. This method will return <c>null</c> at the end of an array.</returns>
+        public override IJsonNumber ReadAsCustomNumber(Type numberType)
+        {
+            return ReadAsCustomNumberInternal(numberType);
+        }
+
+        /// <summary>
         /// Reads the next JSON token from the stream as a <see cref="String"/>.
         /// </summary>
         /// <returns>A <see cref="String"/>. This method will return <c>null</c> at the end of an array.</returns>

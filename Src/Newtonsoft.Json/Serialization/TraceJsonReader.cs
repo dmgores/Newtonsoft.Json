@@ -40,6 +40,13 @@ namespace Newtonsoft.Json.Serialization
             return value;
         }
 
+        public override IJsonNumber ReadAsCustomNumber(Type numberType)
+        {
+            var value = _innerReader.ReadAsCustomNumber(numberType);
+            _textWriter.WriteToken(_innerReader, false, false);
+            return value;
+        }
+
         public override string ReadAsString()
         {
             var value = _innerReader.ReadAsString();

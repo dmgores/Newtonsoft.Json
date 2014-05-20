@@ -890,6 +890,19 @@ namespace Newtonsoft.Json.Serialization
         }
 
         /// <summary>
+        /// Creates a <see cref="JsonCustomNumberContract"/> for the given type.
+        /// </summary>
+        /// <param name="objectType">Type of the object.</param>
+        /// <returns>A <see cref="JsonCustomNumberContract"/> for the given type.</returns>
+        protected virtual JsonCustomNumberContract CreateCustomNumberContract(Type objectType)
+        {
+            JsonCustomNumberContract contract = new JsonCustomNumberContract(objectType);
+            InitializeContract(contract);
+
+            return contract;
+        }
+
+        /// <summary>
         /// Creates a <see cref="JsonLinqContract"/> for the given type.
         /// </summary>
         /// <param name="objectType">Type of the object.</param>
@@ -1004,6 +1017,8 @@ namespace Newtonsoft.Json.Serialization
             if (IsIConvertible(t))
                 return CreatePrimitiveContract(t);
 #endif
+            if (typeof(IJsonNumber).IsAssignableFrom(t))
+                return CreateCustomNumberContract(objectType);
 
             return CreateObjectContract(objectType);
         }
