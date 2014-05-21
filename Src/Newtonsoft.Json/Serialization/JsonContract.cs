@@ -344,6 +344,7 @@ namespace Newtonsoft.Json.Serialization
 #endif
             else if (typeof(IJsonNumber).IsAssignableFrom(underlyingType))
             {
+                IsConvertable = false;
                 InternalReadType = ReadType.ReadAsCustomNumber;
             }
             else

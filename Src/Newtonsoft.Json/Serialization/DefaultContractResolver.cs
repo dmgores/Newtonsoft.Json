@@ -1002,6 +1002,9 @@ namespace Newtonsoft.Json.Serialization
             if (CanConvertToString(t))
                 return CreateStringContract(objectType);
 
+            if (typeof(IJsonNumber).IsAssignableFrom(t))
+                return CreateCustomNumberContract(objectType);
+
 #if !(NETFX_CORE || PORTABLE40 || PORTABLE)
             if (!IgnoreSerializableInterface && typeof(ISerializable).IsAssignableFrom(t))
                 return CreateISerializableContract(objectType);
@@ -1017,9 +1020,7 @@ namespace Newtonsoft.Json.Serialization
             if (IsIConvertible(t))
                 return CreatePrimitiveContract(t);
 #endif
-            if (typeof(IJsonNumber).IsAssignableFrom(t))
-                return CreateCustomNumberContract(objectType);
-
+            
             return CreateObjectContract(objectType);
         }
 
