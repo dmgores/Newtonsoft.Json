@@ -669,7 +669,7 @@ namespace Newtonsoft.Json
         }
 
 
-        internal Type _customNumericType;
+        private Type _customNumericType;
         internal IJsonNumber ReadAsCustomNumberInternal(Type numberType)
         {
             _readType = ReadType.ReadAsCustomNumber;
@@ -680,6 +680,30 @@ namespace Newtonsoft.Json
                 SetToken(JsonToken.None);
 
             return Value as IJsonNumber;
+        }
+
+        private Dictionary<Type, Serialization.JsonNumberDeserialize> _cachedCustomNumberParsers = new Dictionary<Type, JsonNumberDeserialize>();
+        internal Serialization.JsonNumberDeserialize GetCustomNumberParser()
+        {
+            Serialization.JsonNumberDeserialize parserDelegate;
+            if (!_cachedCustomNumberParsers.TryGetValue(_customNumericType, out parserDelegate))
+            {
+                try
+                {
+                    var parserMethodInfo = _customNumericType.GetMethod("JsonNumberDeserialize", new[] { typeof(string) });
+                    parserDelegate = parserMethodInfo.CreateDelegate(typeof(Serialization.JsonNumberDeserialize)) as Serialization.JsonNumberDeserialize;
+                }
+                catch
+                {
+                    var parser = _customNumericType.GetMethod("Parse", new[] { typeof(string) });
+                    parserDelegate = delegate(string number)
+                    {
+                        return parser.Invoke(null, new object[] { number }) as Serialization.IJsonNumber;
+                    };
+                }
+                _cachedCustomNumberParsers[_customNumericType] = parserDelegate;
+            }
+            return parserDelegate;
         }
 
         internal string ReadAsStringInternal()

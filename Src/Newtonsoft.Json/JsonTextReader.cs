@@ -1251,9 +1251,9 @@ namespace Newtonsoft.Json
             else if (_readType == ReadType.ReadAsCustomNumber)
             {
                 string number = _stringReference.ToString();
-                var customNumber = Activator.CreateInstance(_customNumericType) as Serialization.IJsonNumber;
-                customNumber.Parse(number);
-                numberValue = customNumber;
+                var parserDelegate = GetCustomNumberParser();
+                // todo cache parserDelegate to reduce reflection usage
+                numberValue = parserDelegate(number);
                 numberType = JsonToken.Float;
             }
             else
@@ -1322,7 +1322,7 @@ namespace Newtonsoft.Json
 
             SetToken(numberType, numberValue);
         }
-
+        
         private void ParseComment()
         {
             // should have already parsed / character before reaching this method

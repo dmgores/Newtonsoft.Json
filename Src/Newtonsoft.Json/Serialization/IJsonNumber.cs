@@ -6,15 +6,26 @@ using System.Threading.Tasks;
 
 namespace Newtonsoft.Json.Serialization
 {
+
     /// <summary>
-    /// Represents a number that can be converted to/from a json number.  this.ToString() must return a json number.
+    /// Converts the json number into an IJsonNumber
+    /// </summary>
+    /// <param name="s">a json number</param>
+    /// <returns>a .net object that represents the json number</returns>
+    public delegate IJsonNumber JsonNumberDeserialize(string s);
+
+    /// <summary>
+    /// A .net object that represents a json number. Must have at least one of the two following public static methods:
+    /// IJsonNumber JsonNumberDeserialize(string s);
+    /// YourClass Parse(string s); // where YourClass : IJsonNumber.
+    /// Not implementing the former (JsonNumberDeserialize) will result in using reflection on every deserialization.
     /// </summary>
     public interface IJsonNumber
     {
         /// <summary>
-        /// Deserializes the passed in json number
+        /// returns a json number
         /// </summary>
-        /// <param name="s">Json number</param>
-        void Parse(string s);
+        /// <returns></returns>
+        string ToString();
     }
 }
